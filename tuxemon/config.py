@@ -59,7 +59,8 @@ class TuxemonConfig:
             "net_controller_enabled",
         )
         self.locale = cfg.get("game", "locale")
-        self.dev_tools = cfg.getboolean("game", "dev_tools")
+       # self.dev_tools = cfg.getboolean("game", "dev_tools")
+        self.dev_tools = True
         self.recompile_translations = cfg.getboolean(
             "game",
             "recompile_translations",

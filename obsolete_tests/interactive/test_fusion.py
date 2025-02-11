@@ -6,7 +6,7 @@ if __name__ == "__main__":
     #### EXAMPLES ####
     # Note: this test is non-functional
     # The Tuxemon selected here serve only 
-    # as examples of potential fusions.	
+    # as examples of potential fusions.
 
     # Load the sprite data.
     #sapsnap = Body()
