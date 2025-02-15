@@ -4,11 +4,9 @@ import unittest
 import pygame
 from unittest.mock import MagicMock
 from tuxemon.states.combat.combat import CombatState
-from tuxemon.combat import fainted
-from tuxemon.monster import Monster
-from tuxemon.player import Player
 from tuxemon.npc import NPC
-from tuxemon.states.world.worldstate import WorldState
+from tuxemon.battle import Battle
+from tuxemon.monster import Monster
 
 class TestCombat(unittest.TestCase):
 
@@ -62,3 +60,23 @@ class TestCombat(unittest.TestCase):
     def tearDown(self):
         """Clean up after tests."""
         self.combat_state = None
+        self.battle = Battle()
+        self.tuxemon = Monster(name="Testmon", max_hp=10, attack=5, defense=3)
+        self.opponent = Monster(name="Foe", max_hp=10, attack=5, defense=3)
+
+    def test_tuxemon_faints_during_battle(self):
+        """Test that a Tuxemon properly faints when HP reaches 0"""
+        # Deal damage greater than its current HP
+        self.tuxemon.take_damage(15)
+
+        # Check if HP is actually 0
+        self.assertEqual(self.tuxemon.current_hp, 0)
+
+        # Check if the built-in function recognizes it as fainted
+        self.assertTrue(self.tuxemon.is_fainted())
+
+        # Ensure the battle system reacts properly
+        self.battle.handle_fainted(self.tuxemon)
+
+        # (Optional) If your system removes fainted Tuxemon from the active battle
+        self.assertNotIn(self.tuxemon, self.battle.active_tuxemon)
