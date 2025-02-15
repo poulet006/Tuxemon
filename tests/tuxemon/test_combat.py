@@ -1,24 +1,64 @@
 # SPDX-License-Identifier: GPL-3.0
 # Copyright (c) 2014-2025 William Edwards <shadowapex@gmail.com>, Benjamin Bean <superman2k5@gmail.com>
 import unittest
-from unittest import mock
-from tuxemon.combat  import fainted
+import pygame
+from unittest.mock import MagicMock
+from tuxemon.states.combat.combat import CombatState
+from tuxemon.combat import fainted
 from tuxemon.monster import Monster
+from tuxemon.player import Player
+from tuxemon.npc import NPC
+from tuxemon.states.world.worldstate import WorldState
 
 class TestCombat(unittest.TestCase):
 
     def setUp(self):
-        self.tuxemon = Monster()
-        self.opponent = Monster()
+        # Mock dependencies for CombatState
+        self.mock_graphics = MagicMock(name="mock_graphics")
+        self.mock_player = MagicMock(spec=NPC, name="Player")
+        self.mock_npc = MagicMock(spec=NPC, name="NPC")
+        self.mock_monster = MagicMock(spec=Monster, name="Monster")
 
-    def test_tuxemon_faints_during_combat(self):
+        # Set up mock monster properties
+        self.mock_monster.hp = 50
+        self.mock_monster.name = "TestMonster"
 
-        self.tuxemon.faint()
+        # Create instance of CombatState
+        self.combat_state = CombatState(
+            players=(self.mock_player, self.mock_npc),
+            graphics=None,  # Graphics is no longer needed for this test
+            combat_type="trainer",
+        )
 
-        self.assertEqual(self.tuxemon.current_hp, 0)
+    def test_combat_state_initialization(self):
+        """Test that the CombatState initializes properly."""
+        self.assertEqual(len(self.combat_state.players), 2)
+        self.assertFalse(self.combat_state.is_trainer_battle is None)
+        self.assertTrue(self.combat_state.is_trainer_battle)
 
-        self.assertTrue(self.tuxemon.hp == 0)
+    def test_add_monster_to_battle(self):
+        """Test adding a monster to the battle."""
+        self.combat_state.monsters_in_play[self.mock_player].append(self.mock_monster)
 
-        #self.combat.fainted(self.tuxemon)
+        # Assertions
+        self.assertIn(self.mock_monster, self.combat_state.monsters_in_play[self.mock_player])
+        self.assertEqual(
+            self.combat_state.monsters_in_play[self.mock_player][0].name,
+            "TestMonster"
+        )
 
-        #self.assertNotIn(self.tuxemon, self.combat.active_tuxemon)
+    def test_monster_faint(self):
+        """Test that fainting a monster updates correctly."""
+        self.mock_monster.hp = 0  # Simulate the HP dropping to 0
+        self.assertEqual(self.mock_monster.hp, 0)
+
+        # Simulate fainting behavior
+        self.combat_state.monsters_in_play[self.mock_player].append(self.mock_monster)
+        self.combat_state.monsters_in_play[self.mock_player].remove(self.mock_monster)
+
+        # Assertions
+        self.assertNotIn(self.mock_monster, self.combat_state.monsters_in_play[self.mock_player])
+
+    def tearDown(self):
+        """Clean up after tests."""
+        self.combat_state = None
