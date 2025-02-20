@@ -464,6 +464,7 @@ class CombatState(CombatAnimations):
         elif phase == "draw match":
             # it is a draw match; both players were defeated in same round
             draws = self.defeated_players
+            ver
             for draw in draws:
                 message = track_battles(
                     session=local_session,

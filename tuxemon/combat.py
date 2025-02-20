@@ -124,6 +124,18 @@ def party_no_tech(party: list[Monster]) -> list[str]:
     return [p.name for p in party if not p.moves]
 
 
+def free_dead_monsters (party: list[Monster]) -> None:
+    """
+    Frees all dead monsters from the giver party.
+    """
+    for monster in party:
+        if fainted(monster):
+
+            logger.info(f"{monster.name} a été libéré et ses points de vie ont été restaurés.")
+
+            party.remove(monster)
+
+
 def has_effect_param(
     tech: Technique, effect: str, status: str, param: str
 ) -> bool:
@@ -484,7 +496,7 @@ def _handle_win(
         Message to display.
     """
     info = {"name": winner.name.upper()}
-
+    free_dead_monsters(winner.monsters)
     if trainer_battle:
         for loser in losers:
             set_battle(session, OutputBattle.won, winner, loser)
@@ -534,6 +546,7 @@ def _handle_loss(
     info = {"name": loser.name.upper()}
     set_var(session, "teleport_clinic", OutputBattle.lost.value)
 
+    free_dead_monsters(loser.monsters)
     if trainer_battle:
         if loser.isplayer:
             set_var(session, "battle_last_result", OutputBattle.lost.value)
