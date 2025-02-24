@@ -84,6 +84,8 @@ class TuxemonConfig:
         )
         assert self.dialog_speed in ("slow", "max")
 
+        self.nuzlock_mode = cfg.getboolean("gameplay", "nuzlock_mode")
+
         # [player]
         self.player_animation_speed = cfg.getfloat("player", "animation_speed")
         self.player_npc = cfg.get("player", "player_npc")
@@ -222,6 +224,7 @@ def get_defaults() -> Mapping[str, Any]:
                 "gameplay",
                 OrderedDict(
                     (
+                        ("nuzlock_mode", "True"),
                         ("items_consumed_on_failure", "True"),
                         ("encounter_rate_modifier", "1.0"),
                         ("dialog_speed", "slow"),

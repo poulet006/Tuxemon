@@ -56,7 +56,7 @@ from tuxemon.combat import (
     get_awake_monsters,
     get_winners,
     set_var,
-    track_battles,
+    track_battles, free_dead_monsters_nuzlock,
 )
 from tuxemon.condition.condition import Condition
 from tuxemon.db import (
@@ -464,7 +464,6 @@ class CombatState(CombatAnimations):
         elif phase == "draw match":
             # it is a draw match; both players were defeated in same round
             draws = self.defeated_players
-            ver
             for draw in draws:
                 message = track_battles(
                     session=local_session,
@@ -478,6 +477,9 @@ class CombatState(CombatAnimations):
             losers = self.defeated_players
             message = ""
             for winner in winners:
+                if local_session.client.config.nuzlock_mode & winner.isplayer:
+                   free_dead_monsters_nuzlock(winner)
+
                 message = track_battles(
                     session=local_session,
                     output="won",
@@ -487,6 +489,8 @@ class CombatState(CombatAnimations):
                     trainer_battle=self.is_trainer_battle,
                 )
             for loser in losers:
+                if local_session.client.config.nuzlock_mode & loser.isplayer:
+                    free_dead_monsters_nuzlock(loser)
                 message += "\n" + track_battles(
                     session=local_session,
                     output="lost",
@@ -1457,3 +1461,15 @@ class CombatState(CombatAnimations):
             self.client.push_state("MonsterInfoState", kwargs=params)
         else:
             self.client.push_state(FadeOutTransition(caller=self))
+
+        if len(local_session.player.monsters) == 0 & local_session.client.config.nuzlock_mode:
+            self.game_over_nuzlock()
+
+
+    def game_over_nuzlock(self)-> None:
+        """
+        Game over action to use when the entire party of the player is dead during nuzlock mode.
+        """
+        if local_session.client.config.nuzlock_mode:
+            self.game_over_nuzlock()
+
