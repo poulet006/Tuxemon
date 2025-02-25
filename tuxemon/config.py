@@ -219,12 +219,13 @@ def get_defaults() -> Mapping[str, Any]:
                         ("compress_save", "None"),
                     )
                 ),
+
             ),
             (
                 "gameplay",
                 OrderedDict(
                     (
-                        ("nuzlock_mode", "True"),
+                        ("nuzlock_mode", "False"),
                         ("items_consumed_on_failure", "True"),
                         ("encounter_rate_modifier", "1.0"),
                         ("dialog_speed", "slow"),

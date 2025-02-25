@@ -963,7 +963,9 @@ class CombatState(CombatAnimations):
     ) -> None:
         action_time = 0.0
         item.combat_state = self
-        result_item = item.use(user, target)
+        # result_item = item.use(user, target)
+        if not local_session.client.config.nuzlock_mode:
+            result_item = item.use(user, target)
         context = {
             "user": user.name,
             "name": item.name,
@@ -975,11 +977,14 @@ class CombatState(CombatAnimations):
         # handle the capture device
         if item.category == ItemCategory.capture and item_sprite:
             # retrieve tuxeball
-            message += "\n" + T.translate("attempting_capture")
-            action_time = result_item.num_shakes + 1.8
-            self.animate_capture_monster(
-                result_item.success,
-                result_item.num_shakes,
+             message += "\n" + T.translate("attempting_capture")
+             action_time = 3 + 1.8
+             # action_time = result_item.num_shakes + 1.8
+             self.animate_capture_monster(
+                 False,
+                 3,
+               # result_item.success,
+               # result_item.num_shakes,
                 target,
                 item,
                 item_sprite,
@@ -1468,8 +1473,8 @@ class CombatState(CombatAnimations):
 
     def game_over_nuzlock(self)-> None:
         """
-        Game over action to use when the entire party of the player is dead during nuzlock mode.
+        Game over action to use when the entire
+         party of the player is dead during a nuzlock.
         """
-        if local_session.client.config.nuzlock_mode:
-            self.game_over_nuzlock()
+        local_session.player.max_position = 99
 
