@@ -966,6 +966,10 @@ class CombatState(CombatAnimations):
         # result_item = item.use(user, target)
         if not local_session.client.config.nuzlock_mode:
             result_item = item.use(user, target)
+        if (local_session.client.config.nuzlock_mode & self.firstCaptureZone()) |(local_session.client.config.nuzlock_mode & (item.category != ItemCategory.capture)):
+            result_item = item.use(user, target)
+            if result_item.success:
+                self.add_unique_map_nuzlock()
         context = {
             "user": user.name,
             "name": item.name,
@@ -977,10 +981,10 @@ class CombatState(CombatAnimations):
         # handle the capture device
         if item.category == ItemCategory.capture and item_sprite:
             # retrieve tuxeball
-             message += "\n" + T.translate("attempting_capture")
-             action_time = 3 + 1.8
-             # action_time = result_item.num_shakes + 1.8
-             self.animate_capture_monster(
+            message += "\n" + T.translate("attempting_capture")
+            action_time = 3 + 1.8
+            # action_time = result_item.num_shakes + 1.8
+            self.animate_capture_monster(
                  False,
                  3,
                # result_item.success,
@@ -1477,4 +1481,17 @@ class CombatState(CombatAnimations):
          party of the player is dead during a nuzlock.
         """
         local_session.player.max_position = 99
+
+    def add_unique_map_nuzlock(self):
+        """
+        Add the current map to the list of map already used in the nuzlock only if it's not already present.
+        """
+        if local_session.player.world.current_map.name not in local_session.player.world.maps_list_nuzlock:
+            local_session.player.world.maps_list_nuzlock.append(local_session.player.world.current_map.name)
+
+    def firstCaptureZone(self) -> bool:
+        """
+        Return true if the current map hasn't been used to capture a tuxemon.
+        """
+        return local_session.player.world.current_map.name not in local_session.player.world.maps_list_nuzlock
 

@@ -149,6 +149,7 @@ class WorldState(state.State):
         ######################################################################
 
         self.current_map: TuxemonMap
+        self.maps_list_nuzlock: list[str] = []
 
         ######################################################################
         #                            Transitions                             #
