@@ -6,6 +6,9 @@ from tuxemon.db import BattleGraphicsModel
 from tuxemon.states.combat.combat import CombatState
 from tuxemon.monster import Monster
 from tuxemon.npc import NPC
+from tuxemon.npc import NPC
+from tuxemon.battle import Battle
+from tuxemon.monster import Monster
 
 class TestCombat(unittest.TestCase):
 
@@ -57,3 +60,9 @@ class TestCombat(unittest.TestCase):
         self.combat_state.monsters_in_play[self.mock_player].remove(self.mock_monster)
         self.assertNotIn(self.mock_monster, self.combat_state.monsters_in_play[self.mock_player])
 
+    def test_tuxemon_faints_during_battle(self):
+        self.tuxemon.take_damage(15)
+        self.assertEqual(self.tuxemon.current_hp, 0)
+        self.assertTrue(self.tuxemon.is_fainted())
+        self.battle.handle_fainted(self.tuxemon)
+        self.assertNotIn(self.tuxemon, self.battle.active_tuxemon)
